@@ -4,22 +4,22 @@ using System.Collections.Generic;
 
 namespace OE.ALGA.Paradigmak
 {
-    public interface IVégrehajtható
+    public interface IVegrehajthato
     {
-        public void Végrehajtás();
+        public void Vegrehajtas();
     }
 
-    public class TárolóMegteltKivétel : Exception
+    public class TaroloMegteltKivetel : Exception
     {
         public string Message { get; set; } = "A tároló megtelt!";
     }
 
-    public class FeladatTároló<T> where T : IVégrehajtható
+    public class FeladatTarolo<T> where T : IVegrehajthato
     {
         protected T[] tároló;
         protected int n = 0;
 
-        public FeladatTároló(int méret)
+        public FeladatTarolo(int méret)
         {
             tároló = new T[méret];
         }
@@ -33,28 +33,62 @@ namespace OE.ALGA.Paradigmak
             }
             else
             {
-                throw new TárolóMegteltKivétel();
+                throw new TaroloMegteltKivetel();
             }
         }
 
-        public void MindentVégrehajt()
+        public void MindentVegrehajt()
         {
             foreach (var elem in tároló)
             {
                 if (elem != null)
                 {
-                    elem.Végrehajtás();
+                    elem.Vegrehajtas();
                 }
             }
         }
 
     }
 
-    internal interface IFüggő
+    public interface IFuggo
     {
-        public bool FüggőségTeljesül { get; }
+        public bool FuggosegTeljesul { get; }
     }
 
 
+    public class FuggoFeladatTarolo<T> : FeladatTarolo<T> where T : IVegrehajthato, IFuggo
+    {
+        public FuggoFeladatTarolo(int méret) : base(méret)
+        {
+        }
+
+        public void MindentVégrehajt()
+        {
+            foreach (var elem in tároló)
+            {
+                if (elem.FuggosegTeljesul)
+                {
+                    elem.Vegrehajtas();
+                }
+            }
+        }
+
+    }
 }
+
+    
+
+    //public class FeladatTaroloBejaro<T> : IEnumerator<T> where T : IVegrehajthato
+    //{
+    //    private T[] tarolo;
+    //    private int n;
+    //    private int aktualisIndex;
+    //    public T Aktualis { get; }
+
+    //    public void Letrehoz(T[] tomb, int n)
+    //    {
+
+    //    }
+
+    //}
 
