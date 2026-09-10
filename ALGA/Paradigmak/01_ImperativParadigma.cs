@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OE.ALGA.Paradigmak;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,7 +15,7 @@ namespace OE.ALGA.Paradigmak
         public string Message { get; set; } = "A tároló megtelt!";
     }
 
-    public class FeladatTarolo<T> where T : IVegrehajthato
+    public class FeladatTarolo<T> : IEnumerable<T> where T : IVegrehajthato
     {
         protected T[] tároló;
         protected int n = 0;
@@ -37,6 +38,11 @@ namespace OE.ALGA.Paradigmak
             }
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
         public void MindentVegrehajt()
         {
             foreach (var elem in tároló)
@@ -48,6 +54,10 @@ namespace OE.ALGA.Paradigmak
             }
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
     public interface IFuggo
@@ -76,19 +86,38 @@ namespace OE.ALGA.Paradigmak
     }
 }
 
-    
 
-    //public class FeladatTaroloBejaro<T> : IEnumerator<T> where T : IVegrehajthato
-    //{
-    //    private T[] tarolo;
-    //    private int n;
-    //    private int aktualisIndex;
-    //    public T Aktualis { get; }
 
-    //    public void Letrehoz(T[] tomb, int n)
-    //    {
+public class FeladatTaroloBejaro<T> : IEnumerator<T> where T : IVegrehajthato
+{
+    private T[] tarolo;
+    private int n;
+    private int aktualisIndex;
+    public T Aktualis => tarolo[aktualisIndex];
 
-    //    }
+    public T Current => throw new NotImplementedException();
 
-    //}
+    object IEnumerator.Current => Current;
+
+    public FeladatTaroloBejaro(T[] tarolo, int n)
+    {
+        this.tarolo = tarolo;
+        this.n = n;
+    }
+
+    public bool MoveNext()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Reset()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
+    }
+}
 
