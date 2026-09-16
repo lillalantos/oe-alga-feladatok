@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace OE.ALGA.Paradigmak
 {
@@ -40,84 +41,96 @@ namespace OE.ALGA.Paradigmak
 
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return new FeladatTaroloBejaro<T>(tároló, n);
         }
 
-        public void MindentVegrehajt()
-        {
-            foreach (var elem in tároló)
-            {
-                if (elem != null)
-                {
-                    elem.Vegrehajtas();
-                }
-            }
-        }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
+
+        public virtual void MindentVegrehajt()
+        {
+            for (int i=0; i < n; i++)
+            {
+                tároló[i].Vegrehajtas();
+            }
+        }
+
     }
 
     public interface IFuggo
     {
-        public bool FuggosegTeljesul { get; }
+        bool FuggosegTeljesul { get; }
     }
 
 
     public class FuggoFeladatTarolo<T> : FeladatTarolo<T> where T : IVegrehajthato, IFuggo
     {
+
+        public bool FuggosegTeljesul { get; set; }
+
         public FuggoFeladatTarolo(int méret) : base(méret)
         {
         }
 
-        public void MindentVégrehajt()
-        {
-            foreach (var elem in tároló)
+
+            override public void MindentVegrehajt()
             {
-                if (elem.FuggosegTeljesul)
+                for (int i=0; i < n;i++)
                 {
-                    elem.Vegrehajtas();
+                    if (tároló[i].FuggosegTeljesul)
+                    {
+                        tároló[i].Vegrehajtas();
+                    }
                 }
             }
+    }
+
+
+    public class FeladatTaroloBejaro<T> : IEnumerator<T> where T : IVegrehajthato
+    {
+        private T[] tarolo;
+        private int n;
+        private int aktualisIndex=-1;
+        public T Aktualis => tarolo[aktualisIndex];
+
+        public T Current => Aktualis;
+
+        object IEnumerator.Current => Current;
+
+        public FeladatTaroloBejaro(T[] tarolo, int n)
+        {
+            this.tarolo = tarolo;
+            this.n = n;
         }
 
+        public void Alaphelyzet()
+        {
+            aktualisIndex = -1;
+        }
+
+        public bool Kovetkezo()
+        {
+            aktualisIndex++;
+            if (aktualisIndex<n)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool MoveNext() => Kovetkezo();
+        
+
+        public void Reset() => Alaphelyzet();
+
+        public void Dispose() { }
     }
+
+
 }
 
 
-
-public class FeladatTaroloBejaro<T> : IEnumerator<T> where T : IVegrehajthato
-{
-    private T[] tarolo;
-    private int n;
-    private int aktualisIndex;
-    public T Aktualis => tarolo[aktualisIndex];
-
-    public T Current => throw new NotImplementedException();
-
-    object IEnumerator.Current => Current;
-
-    public FeladatTaroloBejaro(T[] tarolo, int n)
-    {
-        this.tarolo = tarolo;
-        this.n = n;
-    }
-
-    public bool MoveNext()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Reset()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
-}
 
