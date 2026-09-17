@@ -7,10 +7,17 @@ namespace OE.ALGA.Paradigmak
     // 2. heti labor feladat - Tesztek: 02_FunkcionálisParadigmaTesztek.cs
 
     // FeltételesFeladatTároló T típusú (-- IVégrehajtható i. megvalósító) generikus osztály -- FeladatTároló leszármazottja, ami képes végrehajtható feladatokat tárolni és feltételesen végrehajtani
-    public class FeltetelesFeladatTarolo<T> : FeladatTarolo<T> where T : IVegrehajthato
+    public class FeltetelesFeladatTarolo<T> : FeladatTarolo<T>, IEnumerable where T : IVegrehajthato
     {
+        //BejáróFeltétel -- T paraméterrel, logikai visszatéréssel
+        public Func<T, bool> BejaroFeltetel { get; set; } = x => true;
 
-        public Func<T, bool> BejaroFeltetel { get; set; }
+        //FeltetesFeladatTárolóBejáró példányt visszaadó bejárhatóság interfész implementálás
+        public IEnumerator GetEnumerator()
+        {
+            return new FeltetelesFeladatTaroloBejaro<T>(BejaroFeltetel, tároló, n);
+        }
+
 
         // Konstruktor csak méret értéket kérje, továbbad ős konstruktorának
         public FeltetelesFeladatTarolo(int méret) : base(méret)
@@ -34,7 +41,44 @@ namespace OE.ALGA.Paradigmak
             }
         }
 
+        public class FeltetelesFeladatTaroloBejaro<T> : FeltetelesFeladatTarolo<T>, IEnumerator where T : IVegrehajthato
+        {
+
+            private Func<T, bool> feltetel;
+            private int aktualis = -1;
+            private T[] tároló;
+            private int n;
 
 
+            public FeltetelesFeladatTaroloBejaro(Func<T, bool> feltetel, T[] tároló, int n) : base(n)
+            {
+                this.feltetel = feltetel;
+                this.tároló = tároló;
+                this.n = n;
+            }
+
+            public void Reset()
+            {
+                aktualis = -1;
+            }
+
+            public T Current => tároló[aktualis];
+            object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+            }
+
+            // Csak azok az értékek, amik megfelelnek a feltételnek
+            public bool MoveNext()
+            {
+                aktualis++;
+                while (aktualis<n && !feltetel(tároló[aktualis]))
+                {
+                    aktualis++;
+                }
+                return aktualis < n;
+            }
+        }
     }
 }
