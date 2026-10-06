@@ -1,243 +1,331 @@
-﻿//using System;
-//using System.Collections;
-//using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
-//namespace OE.ALGA.Adatszerkezetek
-//{
-//    // 4. heti labor feladat - Tesztek: 04_LancoltImplementacioTesztek.cs
+namespace OE.ALGA.Adatszerkezetek
+{
+    // 4. heti labor feladat - Tesztek: 04_LancoltImplementacioTesztek.cs
 
-//    public class LancElem<T>
-//    {
-//        public T tart;
-//        public LancElem<T> kov;
+    public class LancElem<T>
+    {
+        public T tart;
+        public LancElem<T> kov;
 
-//        public LancElem(T tartalom, LancElem<T> kovetkezo = null)
-//        {
-//            tart = tartalom;
-//            kov = kovetkezo;
-//        }
-//    }
+        public LancElem(T tartalom, LancElem<T> kovetkezo = null)
+        {
+            tart = tartalom;
+            kov = kovetkezo;
+        }
 
-//    public class LancoltVerem<T> : Verem<T>
-//    {
+    }
 
-//            private LancElem<T> fej;
-//            public bool Ures { get; private set; }
+    public class LancoltVerem<T> : Verem<T>
+    {
 
-//            public LancoltVerem()
-//            {
-//                LancElem<T> fej = null;
-//            }
+        private LancElem<T> fej;
+        public bool Ures { get; private set; }
 
-//            public void Verembe(T ertek)
-//            {
-//                fej = new LancElem<T>(ertek, fej);
-//            }
+        public LancoltVerem()
+        {
+            fej = null;
+            Ures = true;
+        }
 
-//            public T Verembol()
-//            {
-//                if (Ures)
-//                {
-//                    throw new NincsElemKivetel();
-//                }
-//                else
-//                {
-//                    fej.tart = fej.kov.tart;
-//                    fej = fej.kov;
-//                    return fej.tart;
-//                }
+        public void Verembe(T ertek)
+        {
+            fej = new LancElem<T>(ertek, fej);
+            Ures = false;
+        }
 
-//            }
+        public T Verembol()
+        {
+            if (fej==null)
+            {
+                throw new NincsElemKivetel();
+            }
+            else
+            {
+                T ertek = fej.tart;
+                fej = fej.kov;
 
-//            public T Felso()
-//            {
-//                if (Ures)
-//                {
-//                    throw new NincsElemKivetel();
-//                }
-//                else
-//                {
-//                    return fej.tart;
-//                }
-//            }
+                if (fej == null)
+                    Ures = true;
 
+                return ertek;
+            }
 
-//    }
-   
+        }
 
-//        public class LancoltSor<T> : Sor<T>
-//        {
-
-//            private LancElem<T> fej;
-//            private LancElem<T> vege;
-//            public bool Ures { get; private set; }
-
-//            public LancoltSor()
-//            {
-//                fej = null;
-//                vege = null;
-//            }
+        public T Felso()
+        {
+            if (fej==null)
+            {
+                throw new NincsElemKivetel();
+            }
+            else
+            {
+                return fej.tart;
+            }
+        }
 
 
+    }
 
-//            public T Elso()
-//            {
-//                if (fej!=null)
-//                {
-//                    return fej.tart;
-//                }
-//                throw new NincsElemKivetel();
-//            }
+    public class LancoltSor<T> : Sor<T>
+    {
 
-//            public void Sorba(T ertek)
-//            {
-//                LancElem<T> ujElem = new LancElem<T>(ertek);
-//                if (vege != null)
-//                {
-//                    vege.kov = ujElem;
-//                }
-//                else 
-//                    fej = ujElem;
+        private LancElem<T> fej;
+        private LancElem<T> vege;
+        public bool Ures { get; private set; }
 
-//                vege = ujElem;
-//                Ures = false;
-//            }
-
-//            public T Sorbol()
-//            {
-//                if (fej != null)
-//                {
-//                    fej.tart = fej.kov.tart;
-//                    fej= fej.kov;
-//                    if(fej == null)
-//                    {
-//                        vege = null;
-//                        Ures = true;
-//                    }
-//                    return fej.tart;
-//                }
-//                else
-//                    throw new NincsElemKivetel();
-
-//            }
-//        }
+        public LancoltSor()
+        {
+            fej = null;
+            vege = null;
+            Ures = true;
+        }
 
 
-//        public class LancoltLista<T> : Lista<T>, IEnumerable<T>
-//        {
-//            public LancElem<T> fej;
-//            public int Elemszam { get; private set; }
+        public T Elso()
+        {
+            if (fej != null)
+            {
+                return fej.tart;
+            }
+            throw new NincsElemKivetel();
+        }
 
-//            public LancoltLista()
-//            {
-//                fej = null;
-//            }
-//            public void Hozzafuz(T ertek)
-//            {
-//                LancElem<T> ujElem = new LancElem<T>(ertek);
-//                if (fej == null)
-//                {
-//                    fej = ujElem;
-//                }
-//                else
-//                {
-//                    LancElem<T> aktualis = fej;
-//                    while (aktualis.kov != null)
-//                    {
-//                        aktualis = aktualis.kov;
-//                    }
-//                    aktualis.kov = ujElem;
-//                }
-//            }
-            
+        public void Sorba(T ertek)
+        {
+            LancElem<T> ujElem = new LancElem<T>(ertek);
+            if (vege != null)
+            {
+                vege.kov = ujElem;
+            }
+            else
+                fej = ujElem;
 
-//            public T Kiolvas(int index)
-//            {
-//                throw new NotImplementedException();
-//            }
+            vege = ujElem;
+            Ures = false;
+        }
 
-//            public void Modosit(int index, T ertek)
-//            {
-//                throw new NotImplementedException();
-//            }
+        public T Sorbol()
+        {
+            if (fej != null)
+            {
+                T ertek = fej.tart;
+                fej = fej.kov;
 
-            
+                if (fej == null)
+                {
+                    vege = null;
+                    Ures = true;
+                }
+                return ertek;
+            }
+            else
+                throw new NincsElemKivetel();
 
-//            public void Beszur(int index, T ertek)
-//            {
-//                throw new NotImplementedException();
-//            }
-
-//            public void Torol(T ertek)
-//            {
-//                LancElem<T> aktualis = fej;
-
-//                while (aktualis != null && !aktualis.tart.Equals(ertek))
-//                {
-//                    aktualis = aktualis.kov;
-//                }
-
-//                if (aktualis.tart.Equals(ertek))
-//                {
-//                    fej = aktualis.kov;
-//                }
-
-//        }
-
-//            public void Bejar(Action<T> muvelet)
-//            {
-//                throw new NotImplementedException();
-//            }
+        }
+    }
 
 
-//            IEnumerator IEnumerable.GetEnumerator()
-//            {
-//                return GetEnumerator();
-//            }
-//            public IEnumerator<T> GetEnumerator()
-//            {
-//                return new LancoltListaBejaro(fej);
-//            }
-//        }
+    public class LancoltLista<T> : Lista<T>, IEnumerable<T>
+    {
+        public LancElem<T> fej;
+        public int Elemszam { get; private set; }
 
-//        public class LancoltListaBejaro<T> : IEnumerator<T>
-//        {
+        public LancoltLista()
+        {
+            fej = null;
+            Elemszam = 0;
+        }
 
-//            private LancElem<T> fej;
-//            private LancElem<T> aktualisElem;
-//            public T Aktualis => aktualisElem.tart;
+        public void Hozzafuz(T ertek)
+        {
+            LancElem<T> ujElem = new LancElem<T>(ertek);
+            Elemszam++;
+            if (fej == null)
+            {
+                fej = ujElem;
+            }
+            else
+            {
+                LancElem<T> aktualis = fej;
+                while (aktualis.kov != null)
+                {
+                    aktualis = aktualis.kov;
+                }
+                aktualis.kov = ujElem;
+                aktualis.kov.tart = ertek;
+            }
+        }
 
-//            public T Current => Aktualis;
-//            object IEnumerator.Current => Current;
 
-//            public LancoltListaBejaro(LancElem<T> fej)
-//            {
-//                this.fej = fej;
-//                this.aktualisElem = fej;
-//            }
+        public T Kiolvas(int index)
+        {
+            LancElem<T> seged = fej;
+            int i = 0;
+            while (seged != null && i<index)
+            {
+                seged=seged.kov;
+                i++;
+            }
+            if (seged != null)
+            {
+                return seged.tart;
+            }
+            else
+            {
+                throw new HibasIndexKivetel();
+            }
+        }
 
 
-//            public bool MoveNext()
-//            {
-//                fej = fej.kov;
-//                if (fej != null)
-//                {
+        public void Modosit(int index, T ertek)
+        {
+            LancElem<T> seged = fej;
+            int i = 0;
+            while ((seged != null) && i<index)
+            {
+                seged=seged.kov;
+                i++;
+            }
+            if (seged != null)
+            {
+                seged.tart = ertek;
+            }
+            else
+                throw new HibasIndexKivetel();
+        }
+
+
+
+        public void Beszur(int index, T ertek)
+        {
+            if (fej == null || index == 0)
+            {
+                LancElem<T> ujElem = new LancElem<T>(ertek);
+                ujElem.kov = fej;
+                fej = ujElem;
+                Elemszam++;
+            }
+            else
+            {
+                LancElem<T> seged = fej;
+                int i = 1;
+                while (seged.kov != null && i < index)
+                {
+                    seged = seged.kov;
+                    i++;
+                }
+                if (i == index)
+                {
+                    LancElem<T> ujElem = new LancElem<T>(ertek);
+                    ujElem.kov = seged.kov;
+                    seged.kov = ujElem;
+                    Elemszam++;
+                }
+                else
+                    throw new HibasIndexKivetel();
+            }
+
+        }
+
+        public void Torol(T ertek)
+        {
+            LancElem<T> aktualis = fej;
+            LancElem<T> elozo = null;
+            while (aktualis != null)
+            {
+                if (aktualis.tart.Equals(ertek))
+                {
+                    Elemszam--;
+                    if (elozo == null)
+                    {
+                        fej = aktualis.kov;
+                        aktualis = fej;
+                    }
+                    else
+                    {
+                        elozo.kov = aktualis.kov;
+                        aktualis = aktualis.kov;
+                    }
                     
-//                    return true;
-//                }
-//                return false;
-//            }
+                }
+                else
+                {
+                    elozo = aktualis;
+                    aktualis = aktualis.kov;
+                }
+            }
+        }
 
-//            public void Reset()
-//            {
-//                fej = null;
+        public void Bejar(Action<T> muvelet)
+        {
+            LancElem<T> seged = fej;
+            while (seged!=null)
+            {
+                muvelet(seged.tart);
+                seged = seged.kov;
+            }
+        }
 
-//            }
+        public IEnumerator<T> GetEnumerator()
+        {
+            return new LancoltListaBejaro<T>(fej);
+        }
 
-//            public void Dispose()
-//            { }
-//        }
 
-    
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
-//}
+        
+    }
+
+    public class LancoltListaBejaro<T> : IEnumerator<T>
+    {
+
+        private LancElem<T> fej;
+        private LancElem<T> aktualisElem;
+        public T Aktualis => aktualisElem.tart;
+
+        public T Current => Aktualis;
+        object IEnumerator.Current => Current;
+
+        public LancoltListaBejaro(LancElem<T> fej)
+        {
+            this.fej = fej;
+            this.aktualisElem = null;
+        }
+
+
+        public bool MoveNext()
+        {
+
+            if (aktualisElem == null)
+            {
+                aktualisElem = fej;
+            }
+            else
+            {
+                aktualisElem = aktualisElem.kov;
+            }
+
+            return aktualisElem != null;
+        }
+
+        public void Reset()
+        {
+            aktualisElem = null;
+        }
+
+        public void Dispose()
+        { }
+    }
+
+
+
+}
