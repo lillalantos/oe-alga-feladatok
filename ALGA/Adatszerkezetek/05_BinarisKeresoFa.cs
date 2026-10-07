@@ -147,9 +147,39 @@ namespace OE.ALGA.Adatszerkezetek
             gyoker = ReszfabolTorol(gyoker, ertek);
         }
 
+        protected void ReszfaBejarasPreOrder(FaElem<T> p, Action<T> muvelet)
+        {
+            if (p != null)
+            {
+                muvelet(p.tart);
+                ReszfaBejarasPreOrder(p.bal, muvelet);
+                ReszfaBejarasPreOrder(p.jobb, muvelet);
+            }
+        }
+
+        protected void ReszfaBejarasInOrder(FaElem<T> p, Action<T> muvelet)
+        {
+            if (p != null)
+            {
+                ReszfaBejarasInOrder(p.bal, muvelet);
+                muvelet(p.tart);
+                ReszfaBejarasInOrder(p.jobb, muvelet);
+            }
+        }
+
+        protected void ReszfaBejarasPostOrder(FaElem<T> p, Action<T> muvelet)
+        {
+            if (p != null)
+            {
+                ReszfaBejarasPostOrder(p.bal, muvelet);
+                ReszfaBejarasPostOrder(p.jobb, muvelet);
+                muvelet(p.tart);
+            }
+        }
+
         public void Bejar(Action<T> muvelet)
         {
-            
+            ReszfaBejarasPreOrder(gyoker, muvelet);
         }
     }
 }
