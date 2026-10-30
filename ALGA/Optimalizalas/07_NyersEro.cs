@@ -1,6 +1,156 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 
 namespace OE.ALGA.Optimalizalas
 {
-    // 7. heti labor feladat - Tesztek: 07_NyersEroTesztek.cs
+    
+    public class HatizsakProblema
+    {
+        public HatizsakProblema(int n, int wmax, int[] w, float[] p)
+        {
+            this.n = n;
+            Wmax = wmax;
+            this.w = w;
+            this.p = p;
+        }
+
+        public int n { get; }       //hátizsákba pakolható tárgyak száma
+        public int Wmax { get; }    //hátizsák mérete
+        public int[] w { get; }     //tárgyak súlyai
+        public float[] p { get;}      //tárgyak értékei
+
+
+        public int OsszSuly(bool[] pakolas)
+        {
+            int ossz = 0;
+            for (int i=0; i<n; i++)
+            {
+                if (pakolas[i])
+                {
+                    ossz += w[i];
+                }
+            }
+            return ossz;
+        }
+
+
+        public float OsszErtek(bool[] pakolas)
+        {
+            float ertekek = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (pakolas[i])
+                {
+                    ertekek += p[i];
+                }
+            }
+            return ertekek;
+        }
+
+
+        public bool Ervenyes(bool[] pakolas)
+        {
+            return OsszSuly(pakolas) <= Wmax;
+        }
+
+    }
+
+
+    public class NyersEro<T>
+    {
+        public int m;                       //megoldások száma
+        public Func<int, T> generator;      //lehetséges megoldások generálása
+        public Func<T, float> josag;          //lehetséges megoldások értéke
+        public int LepesSzam { get; private set; }
+
+        public NyersEro(int m, Func<int, T> generator, Func<T, float> josag)
+        {
+            this.m = m;
+            this.generator = generator;
+            this.josag = josag;
+        }
+
+        public T OptimalisMegoldas()
+        {
+            var o = generator(1);
+            for (int i = 1; i < m; i++)
+            {
+                LepesSzam++;
+                var x = generator(i);
+                if( josag(x) > josag(o) )
+                {
+                    o = x;
+                }
+            }
+            return o;
+        }
+    }
+
+
+    public class NyersEroHatizsakPakolas
+    {
+        public int LepesSzam { get; private set; }        //végrehajtott összehasonlítások száma
+        private HatizsakProblema problema;
+
+
+        public NyersEroHatizsakPakolas(HatizsakProblema problema)
+        {
+            this.problema = problema;
+        }
+
+        public bool[] Generator(int i)
+        {
+            int szam = i - 1;
+            bool[] K = new bool[problema.n];
+            
+            for (int j = 0; j < problema.n; j++)
+            {
+                int binaris = 1;
+                for (int k=0; k < j; k++)
+                {
+                    binaris *= 2;
+                }
+
+                K[j] = (szam / binaris) % 2 == 1;
+            }
+
+            return K;            
+        }
+
+        public float Josag(bool[] pakolas)
+        {
+            if (problema.Ervenyes(pakolas))
+            {
+                return problema.OsszErtek(pakolas);
+            }
+            else
+                return -1;
+        }
+
+        public bool[] OptimalisMegoldas()
+        {
+            int lehetsegesMegolasokSzama = 1;
+            for (int k = 0; k < problema.n; k++)
+            {
+                lehetsegesMegolasokSzama *= 2;
+            }
+
+            NyersEro<bool[]> lehetsegesPakolasok = new NyersEro<bool[]>(lehetsegesMegolasokSzama, Generator, Josag);
+            bool[] legjobbMegoldas = lehetsegesPakolasok.OptimalisMegoldas();
+            this.LepesSzam = lehetsegesPakolasok.LepesSzam;
+
+            return legjobbMegoldas;
+        }
+
+        public float OptimalisErtek()
+        {
+            var ertek = OptimalisMegoldas();
+            return problema.OsszErtek(ertek);
+        }
+
+
+    }
+
+
+
 }
