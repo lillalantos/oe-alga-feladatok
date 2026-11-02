@@ -19,22 +19,22 @@ namespace OE.ALGA.Optimalizalas
         public float[,] TablazatFeltoltes()
         {
             float[,] F = new float[(problema.n + 1), problema.Wmax + 1];
-            for (int h = 0; h < problema.n + 1; h++)
+            for (int t = 0; t < problema.n + 1; t++)
             {
-                for (int t = 0; t < problema.Wmax + 1; t++)
+                for (int h = 0; h < problema.Wmax + 1; h++)
                 {
-                    if (h == 0 || t == 0)
+                    if (t == 0 || h == 0)
                     {
-                        F[h, t] = 0;
+                        F[t, h] = 0;
                     }
-                    else if (problema.w[h - 1] > t)
+                    else if (problema.w[t - 1] > h)
                     {
-                        F[h, t] = F[h - 1, t];
+                        F[t, h] = F[t - 1, h];
                         LepesSzam++;
                     }
                     else
                     {
-                        F[h, t] = Math.Max(F[h - 1, t], F[h - 1, t - problema.w[h - 1]] + problema.p[h - 1]);
+                        F[t, h] = Math.Max(F[t - 1, h], F[t - 1, h - problema.w[t - 1]] + problema.p[t - 1]);
                         LepesSzam++;
                     }
                     
@@ -55,17 +55,17 @@ namespace OE.ALGA.Optimalizalas
         {
             float[,] F = TablazatFeltoltes();
             bool[] megoldas = new bool[problema.n];
-            int h = problema.n;
-            int t = problema.Wmax;
+            int t = problema.n;
+            int h = problema.Wmax;
 
-            while (h > 0 && t > 0)
+            while (t > 0 && h > 0)
             {
-                if (F[h, t] != F[h - 1, t])
+                if (F[t, h] != F[t - 1, h])
                 {
-                    megoldas[h - 1] = true;
-                    t -= problema.w[h - 1];
+                    megoldas[t - 1] = true;
+                    h -= problema.w[t - 1];
                 }
-                h--;
+                t--;
             }
 
             return megoldas;
