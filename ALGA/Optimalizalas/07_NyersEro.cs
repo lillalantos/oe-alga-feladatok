@@ -17,7 +17,7 @@ namespace OE.ALGA.Optimalizalas
         public int n { get; }       //hátizsákba pakolható tárgyak száma
         public int Wmax { get; }    //hátizsák mérete
         public int[] w { get; }     //tárgyak súlyai
-        public float[] p { get;}      //tárgyak értékei
+        public float[] p { get;}    //tárgyak értékei
 
 
         public int OsszSuly(bool[] pakolas)
@@ -60,7 +60,7 @@ namespace OE.ALGA.Optimalizalas
     {
         public int m;                       //megoldások száma
         public Func<int, T> generator;      //lehetséges megoldások generálása
-        public Func<T, float> josag;          //lehetséges megoldások értéke
+        public Func<T, float> josag;        //lehetséges megoldások értéke
         public int LepesSzam { get; private set; }
 
         public NyersEro(int m, Func<int, T> generator, Func<T, float> josag)
@@ -141,7 +141,7 @@ namespace OE.ALGA.Optimalizalas
 
             return legjobbMegoldas;
         }
-
+        
         public float OptimalisErtek()
         {
             var ertek = OptimalisMegoldas();
