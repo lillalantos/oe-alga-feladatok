@@ -97,7 +97,24 @@ namespace OE.ALGA.Adatszerkezetek
             }
         }
 
-        int Graf<int, EgeszGrafEl>.ElekSzama => throw new NotImplementedException();
+        int Graf<int, EgeszGrafEl>.ElekSzama
+        {
+            get
+            {
+                int elekSzama = 0;
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (M[i, j])
+                        {
+                            elekSzama++;
+                        }
+                    }
+                }
+                return elekSzama;
+            }
+        }
 
         public Halmaz<int> Szomszedai(int csucs)
         {
