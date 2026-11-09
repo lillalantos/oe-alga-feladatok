@@ -17,7 +17,6 @@ namespace OE.ALGA.Adatszerkezetek
             KupacotEpit();
         }
 
-        // TISZTA 0-S INDEXELÉS KÉPLETEI (STATIKUSAN)
         public static int Bal(int i)
         {
             return 2 * i + 1;
@@ -57,7 +56,7 @@ namespace OE.ALGA.Adatszerkezetek
 
         public void KupacotEpit()
         {
-            // A 0-s indexelésnél innen indulunk visszafelé a 0. indexig
+            
             for (int i = (n / 2) - 1; i >= 0; i--)
             {
                 Kupacol(i);
@@ -67,7 +66,6 @@ namespace OE.ALGA.Adatszerkezetek
 
     public class KupacRendezes<T> : Kupac<T> where T : IComparable<T>
     {
-        // A teljes tömb hossza az n, mivel minden indexet (0-tól) használunk!
         public KupacRendezes(T[] A) : base(A, A.Length, (a, b) => a.CompareTo(b) > 0)
         {
         }
@@ -77,7 +75,6 @@ namespace OE.ALGA.Adatszerkezetek
             this.n = E.Length;
             KupacotEpit();
 
-            // Az utolsó elemtől az 1. elemig cserélünk a 0-s gyökérrel
             for (int i = E.Length - 1; i > 0; i--)
             {
                 T seged = E[0];
@@ -85,14 +82,13 @@ namespace OE.ALGA.Adatszerkezetek
                 E[i] = seged;
                 n--;
 
-                Kupacol(0); // Süllyesztés mindig a 0. gyökértől
+                Kupacol(0); 
             }
         }
     }
 
     public class KupacPrioritasosSor<T> : Kupac<T>, PrioritasosSor<T> where T : IComparable
     {
-        // Nincs meret + 1 trükközés, pont annyi hely kell, amennyit kérnek
         public KupacPrioritasosSor(int meret, Func<T, T, bool> nagyobbPrioritas)
             : base(new T[meret], 0, nagyobbPrioritas)
         { }
@@ -102,12 +98,12 @@ namespace OE.ALGA.Adatszerkezetek
         public T Elso()
         {
             if (n == 0) throw new NincsElemKivetel();
-            return E[0]; // Gyökér a 0. indexen
+            return E[0]; 
         }
 
         public void Frissit(T elem)
         {
-            int i = 0; // 0-tól keressük
+            int i = 0; 
             while (i < n && E[i].CompareTo(elem) != 0)
             {
                 i++;
@@ -123,11 +119,11 @@ namespace OE.ALGA.Adatszerkezetek
 
         public void Sorba(T ertek)
         {
-            if (n < E.Length) // Pontosan a méretig mehet
+            if (n < E.Length) 
             {
-                E[n] = ertek; // Betesszük a legelső üres helyre
-                KulcsotFelvisz(n); // Felhúzzuk
-                n++; // Növeljük a darabszámot
+                E[n] = ertek; 
+                KulcsotFelvisz(n); 
+                n++; 
             }
             else
                 throw new NincsHelyKivetel();
