@@ -4,44 +4,36 @@ using System.Collections.Generic;
 
 namespace OE.ALGA.Paradigmak
 {
-    // 2. heti labor feladat - Tesztek: 02_FunkcionálisParadigmaTesztek.cs
 
-    // FeltételesFeladatTároló T típusú (-- IVégrehajtható i. megvalósító) generikus osztály -- FeladatTároló leszármazottja, ami képes végrehajtható feladatokat tárolni és feltételesen végrehajtani
+
     public class FeltetelesFeladatTarolo<T> : FeladatTarolo<T>, IEnumerable where T : IVegrehajthato
     {
-        //BejáróFeltétel -- T paraméterrel, logikai visszatéréssel
+
         public Func<T, bool> BejaroFeltetel { get; set; } = x => true;
 
-        //FeltetesFeladatTárolóBejáró példányt visszaadó bejárhatóság interfész implementálás
+        public FeltetelesFeladatTarolo(int méret) : base(méret)
+        {
+        }
+
+        public void FeltetelesVegrehajtas(Func<T, bool> feltetel)           // csak azokat a feladatokat hajtja végre, amik megfelelnek a feltételnek
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (feltetel(tároló[i]))
+                {
+                    tároló[i].Vegrehajtas();
+                }
+            }
+        }
+
         public IEnumerator GetEnumerator()
         {
             return new FeltetelesFeladatTaroloBejaro<T>(BejaroFeltetel, tároló, n);
         }
 
+    }
 
-        // Konstruktor csak méret értéket kérje, továbbad ős konstruktorának
-        public FeltetelesFeladatTarolo(int méret) : base(méret)
-        {
-        }
-
-        // FeltételesVégrehajtás metódus  -- feltétel paraméterként T paraméterű függvényt vár -- visszatérés logikai
-        public void FeltetelesVegrehajtas(Func<T, bool> feltetel)
-        {
-
-            // Függvény: MindentVégrehajt-hoz hasonlóan elemek vizsgálata
-            for (int i = 0; i < n; i++)
-            {
-                // Minden elemnél hívja meg a feltétel paraméterként kapott függvényt -- átadva az aktuális elemet paraméterként
-                if (feltetel(tároló[i]))
-                {
-                    // IGAZ - adott elem Végrehajtás
-                    tároló[i].Vegrehajtas();
-                }
-                // HAMIS - kihagyás
-            }
-        }
-
-        public class FeltetelesFeladatTaroloBejaro<T> : FeltetelesFeladatTarolo<T>, IEnumerator where T : IVegrehajthato
+    public class FeltetelesFeladatTaroloBejaro<T> : IEnumerator where T : IVegrehajthato
         {
 
             private Func<T, bool> feltetel;
@@ -50,7 +42,7 @@ namespace OE.ALGA.Paradigmak
             private int n;
 
 
-            public FeltetelesFeladatTaroloBejaro(Func<T, bool> feltetel, T[] tároló, int n) : base(n)
+            public FeltetelesFeladatTaroloBejaro(Func<T, bool> feltetel, T[] tároló, int n)
             {
                 this.feltetel = feltetel;
                 this.tároló = tároló;
@@ -69,11 +61,12 @@ namespace OE.ALGA.Paradigmak
             {
             }
 
+
             // Csak azok az értékek, amik megfelelnek a feltételnek
             public bool MoveNext()
             {
                 aktualis++;
-                while (aktualis<n && !feltetel(tároló[aktualis]))
+                while (aktualis<n && !feltetel(tároló[aktualis]))           // while mert ha egy nem felel meg a feltételnek, attól még van több elemünk amit vizsgálunk nem állhat le false-l
                 {
                     aktualis++;
                 }
@@ -81,4 +74,4 @@ namespace OE.ALGA.Paradigmak
             }
         }
     }
-}
+
