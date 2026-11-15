@@ -8,7 +8,6 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace OE.ALGA.Adatszerkezetek
 {
-    // 3. heti labor feladat - Tesztek: 03_TombImplementacioTesztek.cs
 
     // T generikus osztály, ami tömbbel implementál verem műveleteket
     // Valósítsa meg a Verem<T> interfészt
@@ -27,7 +26,6 @@ namespace OE.ALGA.Adatszerkezetek
 
         public void Verembe(T ertek)
         {
-
             if (n < E.Length)
             {
                 E[n] = ertek;
@@ -41,10 +39,10 @@ namespace OE.ALGA.Adatszerkezetek
         }
 
         public T Verembol()
-        {
-            if (n>0)
+        {   
+            if (n > 0)                  // ellenőrzés - van e még benne elem
             {
-                T elem = E[n - 1];
+                T elem = E[n - 1];      // n mindig a következő szabadot reprezentálja -> n - 1 az aktuális utolsó
                 n--;
                 if(n==0)
                 {
@@ -62,7 +60,7 @@ namespace OE.ALGA.Adatszerkezetek
         {
             if (!Ures)
             {
-                return E[n-1];
+                return E[n - 1];
             }
             else
             {
@@ -78,16 +76,16 @@ namespace OE.ALGA.Adatszerkezetek
     public class TombSor<T> : Sor<T>
     {
         private T[] E;
-        private int e; // első elem index 
-        private int u;  // utoljára betett elem 
-        private int n; // a sor aktuális elemszáma
+        private int e;              // első elem index -> ki vár legrégebben -> first out
+        private int u;              // utoljára betett elem -> legkevesebb ideje vár -> last out
+        private int n;              // a sor aktuális elemszáma
         public bool Ures { get; private set; }
 
         public TombSor(int meret)
         {
             E = new T[meret];
-            e = 0;
-            u = -1;
+            e = 0;      
+            u = -1;                 // legelső betételkor is növeléssel kezdünk -> akkor lesz 0
             n = 0;
             Ures = true;
         }
@@ -96,7 +94,7 @@ namespace OE.ALGA.Adatszerkezetek
         {
             if (n < E.Length)
             {
-                u = (u + 1) % E.Length;
+                u = (u + 1) % E.Length;         // ha eléri a tömb végét visszaugrik az elejére (pl.: 5 hosszú tömbnél 4+1%5 = 0)
                 E[u] = ertek;
                 n++;
                 Ures = false;
@@ -112,7 +110,7 @@ namespace OE.ALGA.Adatszerkezetek
             if (!Ures)
             {
                 T ertek = E[e];
-                e = (e + 1) % E.Length;
+                e = (e + 1) % E.Length;     // első elemnek is körkörösen kell haladnia, elérheti a tömb végét
                 n--;
                 if (n == 0)
                 {
@@ -144,11 +142,10 @@ namespace OE.ALGA.Adatszerkezetek
     public class TombLista<T> : Lista<T>, IEnumerable<T>
     {
         private T[] E;
-        private int n; // a lista aktuális elemszáma
+        private int n;                              // a lista aktuális elemszáma
         public bool Ures { get; private set; }
 
         int Lista<T>.Elemszam => n;
-
 
         public TombLista(int meret = 1)
         {
@@ -183,15 +180,9 @@ namespace OE.ALGA.Adatszerkezetek
         }
 
 
-        public void Hozzafuz(T ertek)
-        {
-            Beszur(n, ertek);
-        }
-
-
         public void Beszur(int index, T ertek)
         {
-            if(index<0 || index>n)
+            if(index < 0 || index > n)
             {
                 throw new HibasIndexKivetel();
             }
@@ -199,27 +190,33 @@ namespace OE.ALGA.Adatszerkezetek
             {
                 if (n == E.Length)
                 {
-                    T[] e = new T[E.Length * 2];
+                    T[] e = new T[E.Length * 2];            // ha tele van kétszer akkora méretű
                     for (int i = 0; i < n; i++)
                     {
                         e[i] = E[i];
                     }
-                    e[n] = ertek;
-                    E = e;
+                    E = e;                                  // referencia változtatása
                 }
-                n++;
                 for (int i = n - 1; i > index; i--)
                 {
-                    E[i] = E[i - 1];
+                    E[i] = E[i - 1];                        // előrébb toljuk a már ott lévő adatokat jobbra 
                 }
-                E[index] = ertek;
+                E[index] = ertek;                           // beszúrjuk a felszabadított helyre az értéket
+                n++;
+                Ures = false;
             }
             
         }
+        
+        public void Hozzafuz(T ertek)
+        {
+            Beszur(n, ertek);
+        }
+
 
         public void Torol(T ertek)
         {
-            int db = 0;
+            int db = 0;                         // törölt darabok száma
             for (int i = 0; i < n; i++)
             {
                 if (E[i].Equals(ertek))
@@ -227,11 +224,16 @@ namespace OE.ALGA.Adatszerkezetek
                     db++;
                 }
                 else
-                {
-                    E[i - db] = E[i];
+                {   
+                    E[i - db] = E[i];           // a nem törlendő elem visszamásolása annyival balra ahányat előtte töröltünk
                 }
             }
             n -= db;
+
+            if (n == 0)
+            {
+                Ures = true;
+            }
         }
 
         public void Bejar(Action<T> muvelet)
@@ -258,8 +260,7 @@ namespace OE.ALGA.Adatszerkezetek
     {
         T[] E;
         int n;
-        int aktualisIndex=-1;
-        public T Aktualis => E[aktualisIndex];
+        int aktualisIndex = -1;
 
         public TombListaBejaro(T[] e, int n)
         {
@@ -267,14 +268,14 @@ namespace OE.ALGA.Adatszerkezetek
             this.n = n;
         }
 
-
+        public T Aktualis => E[aktualisIndex];
         public T Current => Aktualis;
 
         object IEnumerator.Current => Current;
 
         public bool Kovetkezo()
         {
-            if (aktualisIndex < n-1)
+            if (aktualisIndex < n - 1)
             {
                 aktualisIndex++;
                 return true;
