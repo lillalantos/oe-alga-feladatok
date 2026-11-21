@@ -190,22 +190,22 @@ namespace OE.ALGA.Adatszerkezetek
             {
                 if (n == E.Length)
                 {
-                    T[] e = new T[E.Length * 2];            // ha tele van kétszer akkora méretű
-                    for (int i = 0; i < n; i++)
+                    T[] e = new T[E.Length * 2];            // ha megtelt 2-szer akkora méret kell
+                    for (int i = 0; i < n; i++)             // elemek átmásolása újba
                     {
                         e[i] = E[i];
                     }
-                    E = e;                                  // referencia változtatása
+                    //e[n] = ertek;                           // újba beszúrás
+                    E = e;                                  // referencia átadás
                 }
-                for (int i = n - 1; i > index; i--)
-                {
-                    E[i] = E[i - 1];                        // előrébb toljuk a már ott lévő adatokat jobbra 
-                }
-                E[index] = ertek;                           // beszúrjuk a felszabadított helyre az értéket
                 n++;
-                Ures = false;
+                for (int i = n - 1; i > index; i--)         // minden elem jobbra tolása a beszúrthoz képest
+                {
+                    E[i] = E[i - 1];
+                }
+                E[index] = ertek;                           // új elem megfelelő helyre tétele
             }
-            
+
         }
         
         public void Hozzafuz(T ertek)

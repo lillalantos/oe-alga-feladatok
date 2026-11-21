@@ -4,12 +4,10 @@ using System.Collections.Generic;
 
 namespace OE.ALGA.Adatszerkezetek
 {
-    // 4. heti labor feladat - Tesztek: 04_LancoltImplementacioTesztek.cs
-
     public class LancElem<T>
     {
-        public T tart;
-        public LancElem<T> kov;
+        public T tart;                  // elem tartalma
+        public LancElem<T> kov;         // elem mutatója a következőre
 
         public LancElem(T tartalom, LancElem<T> kovetkezo = null)
         {
@@ -33,20 +31,20 @@ namespace OE.ALGA.Adatszerkezetek
 
         public void Verembe(T ertek)
         {
-            fej = new LancElem<T>(ertek, fej);
+            fej = new LancElem<T>(ertek, fej);      // fejhez szúrunk be nem a legvégére, mint a listánál
             Ures = false;
         }
 
         public T Verembol()
         {
-            if (fej==null)
+            if (fej == null)
             {
                 throw new NincsElemKivetel();
             }
             else
             {
-                T ertek = fej.tart;
-                fej = fej.kov;
+                T ertek = fej.tart;                 // az első elemet vesszük ki mert a Verembe() az elejére szúr -> teljesül a LIFO
+                fej = fej.kov;                      // ha a kövire mutat már semmi nem mutat a törlendőre -> törlődik
 
                 if (fej == null)
                     Ures = true;
@@ -58,13 +56,13 @@ namespace OE.ALGA.Adatszerkezetek
 
         public T Felso()
         {
-            if (fej==null)
+            if (fej == null)
             {
                 throw new NincsElemKivetel();
             }
             else
             {
-                return fej.tart;
+                return fej.tart;                    // csak kiolvasunk, nem törlődik vagy adódik hozzá semmi, de ugyan az a logika
             }
         }
 
@@ -74,8 +72,8 @@ namespace OE.ALGA.Adatszerkezetek
     public class LancoltSor<T> : Sor<T>
     {
 
-        private LancElem<T> fej;
-        private LancElem<T> vege;
+        private LancElem<T> fej;            // innen veszünnk ki    
+        private LancElem<T> vege;           // ide teszünk be újat
         public bool Ures { get; private set; }
 
         public LancoltSor()
@@ -100,10 +98,10 @@ namespace OE.ALGA.Adatszerkezetek
             LancElem<T> ujElem = new LancElem<T>(ertek);
             if (vege != null)
             {
-                vege.kov = ujElem;
+                vege.kov = ujElem;              // ha már van benne más elem az mutasson az újra
             }
             else
-                fej = ujElem;
+                fej = ujElem;                   // ha még nincs a fej maga lesz az új elem
 
             vege = ujElem;
             Ures = false;
@@ -188,7 +186,7 @@ namespace OE.ALGA.Adatszerkezetek
             int i = 0;
             while ((seged != null) && i<index)
             {
-                seged=seged.kov;
+                seged = seged.kov;
                 i++;
             }
             if (seged != null)
@@ -236,17 +234,22 @@ namespace OE.ALGA.Adatszerkezetek
         {
             LancElem<T> aktualis = fej;
             LancElem<T> elozo = null;
+
+
             while (aktualis != null)
             {
                 if (aktualis.tart.Equals(ertek))
                 {
                     Elemszam--;
-                    if (elozo == null)
+                    if (elozo == null)                  // ha a fejet kell törölni
                     {
                         fej = aktualis.kov;
                         aktualis = fej;
                     }
                     else
+                    {
+                                                        // ha köztes elemet kell törölni
+                    }
                     {
                         elozo.kov = aktualis.kov;
                         aktualis = aktualis.kov;
@@ -264,7 +267,7 @@ namespace OE.ALGA.Adatszerkezetek
         public void Bejar(Action<T> muvelet)
         {
             LancElem<T> seged = fej;
-            while (seged!=null)
+            while (seged != null)
             {
                 muvelet(seged.tart);
                 seged = seged.kov;

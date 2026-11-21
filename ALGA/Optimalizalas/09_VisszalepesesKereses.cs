@@ -25,21 +25,22 @@ namespace OE.ALGA.Optimalizalas
         public int LepesSzam { get; protected set; }
 
 
-        protected void Backtrack(int szint, T[] E, bool van, T[] O)         
+        protected virtual void Backtrack(int szint, T[] E, bool van, T[] O)         
         {
             int i = 0;
-            while (i < M[szint])
+            while (i < M[szint])                        // adott szinten a részmegoldások bejárása
             {
                 LepesSzam++;
-                if ( ft(szint, R[szint, i]) && fk(szint, R[szint, i], E) )
+                if ( ft(szint, R[szint, i]) && fk(szint, R[szint, i], E) )          // ha adott szinten a részmegoldás lehetséges és előtte választottal sem zárják ki egymást
                 {
-                    E[szint] = R[szint, i];
-                    if (szint == n - 1)
+                    E[szint] = R[szint, i];             // rögzítjük a részmegoldást
+                    if (szint == n - 1)                 // legmélyebb szint -> teljes megoldás elérése
                     {
-                        if (josag(E) > josag(O))
+                        if (josag(E) > josag(O))        // ha ez jobb megoldás, mint az eddigi, állítsa át arra
                         {
                             for (int j=0; j<=szint; j++)
                             {
+                                //Array.Copy(E, O, n);
                                 O[j] = E[j];
                             }
                             van = true;
@@ -59,8 +60,8 @@ namespace OE.ALGA.Optimalizalas
 
         public T[] OptimalisMegoldas()
         {
-            T[] E = new T[n];
-            T[] O = new T[n];
+            T[] E = new T[n];       // épp épülő megoldás
+            T[] O = new T[n];       // eddigi legjobb megoldás
             bool van = false;
 
             Backtrack(0, E, van, O);
@@ -90,13 +91,13 @@ namespace OE.ALGA.Optimalizalas
 
             for (int i=0; i<problema.n; i++)
             {
-                M[i] = 2;
+                M[i] = 2;                                   // vagy bekerül vagy nem 
 
                 R[i, 0] = true;
                 R[i, 1] = false;
             }
 
-            Func<int, bool, bool> ft = (szint, r) =>
+            Func<int, bool, bool> ft = (szint, r) =>                    // ha a tárgy súlya nagyobb mint a kapacitás false
             {
                 if (r && problema.w[szint] > problema.Wmax)
                 {
@@ -105,10 +106,10 @@ namespace OE.ALGA.Optimalizalas
                 return true;
             };
 
-            Func<int, bool, bool[], bool> fk = (szint, r, E) =>
+            Func<int, bool, bool[], bool> fk = (szint, r, E) =>         // érvényes, ha eddigi szinteken betett súly + mosatni nem haladja meg a kapacitást
             {
                 int eddigiSuly = 0;
-                for (int i=0; i<szint; i++)
+                for (int i=0; i < szint; i++)
                 {
                     if (E[i])
                         eddigiSuly += problema.w[i];
@@ -121,7 +122,7 @@ namespace OE.ALGA.Optimalizalas
 
             };
 
-            Func<bool[], float> josag = (E) => problema.OsszErtek(E);
+            Func<bool[], float> josag = (E) => problema.OsszErtek(E);               // akkor jobb egyik megoldás másiknál, ha az összértéke nagyobb
 
             VisszaLepesesOptimalizalo<bool> visszaLepesesOptimalizalo = new VisszaLepesesOptimalizalo<bool>(problema.n, M, R, ft, fk, josag);
 
@@ -140,6 +141,8 @@ namespace OE.ALGA.Optimalizalas
 
     }
 
+
+
     public class SzetvalasztasEsKorlatozasOptimalizacio<T> : VisszaLepesesOptimalizalo<T>
     {
         protected Func<int, T[], float> fb;     //felső becslés a hátralevő feladatok optimális megoldására
@@ -147,10 +150,9 @@ namespace OE.ALGA.Optimalizalas
         public SzetvalasztasEsKorlatozasOptimalizacio(int n, int[] m, T[,] r, Func<int, T, bool> ft, Func<int, T, T[], bool> fk, Func<T[], float> josag, Func<int, T[], float> fb) : base(n, m, r, ft, fk, josag)
         {
             this.fb = fb;
-
         }
 
-        protected void BackTrack(int szint, T[] E, bool van, T[] O)
+        protected override void Backtrack(int szint, T[] E, bool van, T[] O)
         {
             int i = 0;
             while (i < M[szint] )
@@ -164,7 +166,7 @@ namespace OE.ALGA.Optimalizalas
                         Array.Copy(E, O, n);
                         van = true;
                     }
-                    else if(!van || (josag(E) + fb(szint, E) > josag(O) ))
+                    else if(!van || (josag(E) + fb(szint, E) > josag(O) ))              // ha még nincs teljes megoldás VAGY eddigi értékek és a hátralevő szintek becsült maximuma meghaladja eddigi legjobbat -> különben nincs értelme vizsgálni 
                     {
                         Backtrack(szint + 1, E, van, O);
                     }
@@ -223,6 +225,8 @@ namespace OE.ALGA.Optimalizalas
 
             Func<bool[], float> josag = (E) => problema.OsszErtek(E);
 
+
+            // felső becslés
             Func<int, bool[], float> fb = (szint, E) =>
             {
                 float becsultErtek = 0;
