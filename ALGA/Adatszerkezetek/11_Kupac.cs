@@ -37,6 +37,7 @@ namespace OE.ALGA.Adatszerkezetek
 
 
         // ha az i-edik kisebb prioritású, mint valamelyik gyereke, akkor cserél és rekurzívan folytat
+        // feltétel: i alatti részfa már kupac, csak az i-edik csomópontnál lehet probléma
         public void Kupacol(int i)
         {
             int bal = Bal(i);
@@ -108,6 +109,8 @@ namespace OE.ALGA.Adatszerkezetek
             return E[0]; 
         }
 
+
+        // egy elem prioritása változott, frissíteni kell
         public void Frissit(T elem)
         {
             int i = 0; 
@@ -115,15 +118,17 @@ namespace OE.ALGA.Adatszerkezetek
             {
                 i++;
             }
-            if (i < n)
+            if (i < n)                          // nem tudni nőtt vagy csökkent
             {
-                KulcsotFelvisz(i);
-                Kupacol(i);
+                KulcsotFelvisz(i);              // felfelé mozgatja, ha nőtt a prioritása
+                Kupacol(i);                     // lefelé mozgatja, ha csökkent a prioritása
             }
             else
                 throw new NincsElemKivetel();
         }
 
+
+        // kupac végére tesszük, majd felfelé mozgatjuk, amíg a szülőnél nagyobb prioritású
         public void Sorba(T ertek)
         {
             if (n < E.Length) 
@@ -140,13 +145,15 @@ namespace OE.ALGA.Adatszerkezetek
         {
             if (n == 0) throw new NincsElemKivetel();
 
-            var seged = E[0];
-            E[0] = E[n - 1]; 
+            var seged = E[0];           // legnagyobb elem kimentése
+            E[0] = E[n - 1];            // utolsó elem gyökérbe -> megmarad a fa váza
             n--;
-            Kupacol(0); 
+            Kupacol(0);                 // újra kupacolás a gyökérnél, hogy a fa ismét kupac legyen
             return seged;
         }
 
+
+        // elemet felfelé mozgatja, amíg a szülőnél nagyobb prioritású          - Kupacol párja, szülővel hasonlít, nem gyerekkel 
         public void KulcsotFelvisz(int i)
         {
             int sz = Szulo(i);
