@@ -11,6 +11,8 @@ namespace OE.ALGA.Adatszerkezetek
         public FaElem<T> bal;               
         public FaElem<T> jobb;
 
+        //public int darab = 1;
+
         public FaElem(T tartalom, FaElem<T> bal = null, FaElem<T> jobb = null)
         {
             tart = tartalom;
@@ -45,6 +47,10 @@ namespace OE.ALGA.Adatszerkezetek
                 {
                     p.jobb = ReszfabaBeszur(p.jobb, ertek);
                 }
+                //else
+                //{
+                //    p.darab++;                                         
+                //}
             }
 
             // == 0 nem kell mert akkor már szerepel benne az ertek, amit be akarunk szúrni 
@@ -100,8 +106,13 @@ namespace OE.ALGA.Adatszerkezetek
             }
             else
             {
-                p.tart = q.tart;                                // talált elem felmásolása gyökérbe
-                q = q.bal;                                      // talált helyettes elem törlése, úgy hogy annak bal ágával helyettesítjük
+                //p.darab--;
+                //if (p.darab == 0)
+                //{
+                    p.tart = q.tart;                                // talált elem felmásolása gyökérbe
+                    //p.darab = q.darab;
+                    q = q.bal;                                      // talált helyettes elem törlése, úgy hogy annak bal ágával helyettesítjük
+                //}                                     
                 return q;
             }
         }
@@ -122,12 +133,16 @@ namespace OE.ALGA.Adatszerkezetek
                 else                                               // ha megtaláltuk, amit törölni szeretnénk
                 {
                     if (p.bal == null)          
-                    {   
-                        p = p.jobb;                                // ha nincs neki bal eleme a törölt helyére csak a jobb kerülhet
+                    {
+                        //p.darab--;
+                        //if (p.darab == 0)
+                            p = p.jobb;                                // ha nincs neki bal eleme a törölt helyére csak a jobb kerülhet
                     }
                     else if (p.jobb == null)
                     {
-                        p = p.bal;
+                        //p.darab--;
+                        //if (p.darab == 0)
+                            p = p.bal;
                     }
                     else
                     {
@@ -135,6 +150,7 @@ namespace OE.ALGA.Adatszerkezetek
                     }
                 }
 
+                
                 return p;               // frissített gyökérelem visszaadás
             }
             else
@@ -186,6 +202,31 @@ namespace OE.ALGA.Adatszerkezetek
         {
             ReszfaBejarasPreOrder(gyoker, muvelet);
         }
+
+
+        //public int Darab (T ertek)
+        //{
+        //    if (ertek != null)
+        //    {
+        //        var p = gyoker;
+        //        while (p.tart.CompareTo(ertek) != 0)
+        //        {
+        //            if (p.tart.CompareTo(ertek) > 0)
+        //            {
+        //                p = p.bal;
+        //            }
+        //            else
+        //            {
+        //                p = p.jobb;
+        //            }
+        //        }
+        //        return p.darab;
+        //    }
+        //    else
+        //    {
+        //        throw new NincsElemKivetel();
+        //    }
+        //}
     }
 }
 
