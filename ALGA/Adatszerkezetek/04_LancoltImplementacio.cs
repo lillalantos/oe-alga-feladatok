@@ -248,18 +248,14 @@ namespace OE.ALGA.Adatszerkezetek
                     }
                     else
                     {
-                                                        // ha köztes elemet kell törölni
+                        elozo.kov = aktualis.kov;           // ha köztes elemet kell törölni
+                        aktualis = aktualis.kov;  
                     }
-                    {
-                        elozo.kov = aktualis.kov;
-                        aktualis = aktualis.kov;
-                    }
-                    
                 }
                 else
                 {
                     elozo = aktualis;
-                    aktualis = aktualis.kov;
+                    aktualis = aktualis.kov;                // ha nincs törlés mindkét mutató előre lép
                 }
             }
         }

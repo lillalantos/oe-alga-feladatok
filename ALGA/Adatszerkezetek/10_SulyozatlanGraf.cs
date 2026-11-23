@@ -17,6 +17,8 @@ namespace OE.ALGA.Adatszerkezetek
         public int Honnan { get; }
         public int Hova { get; }
 
+
+        // előbb Honnan, egyezés esetén Hova alapján döntés 
         public virtual int CompareTo(EgeszGrafEl? obj)
         {
             if (obj != null && obj is EgeszGrafEl b)
@@ -34,15 +36,15 @@ namespace OE.ALGA.Adatszerkezetek
 
     public class CsucsmatrixSulyozatlanEgeszGraf : SulyozatlanGraf<int, EgeszGrafEl>
     {
-        private int n;
-        private bool[,] M;
+        private int n;                                      // csúcsok száma
+        private bool[,] M;                                  // M[honnan, hova] = true, ha vezet köztük él
 
         public CsucsmatrixSulyozatlanEgeszGraf(int n)
         {
             this.n = n;
             M = new bool[n,n];
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)                     // explicit nullázása minden élnek alapértelmezetten 
             {
                 for (int j = 0; j < n; j++)
                 {
@@ -51,7 +53,24 @@ namespace OE.ALGA.Adatszerkezetek
             }
         }
 
+        
+
+
         public int CsucsokSzama => n;
+        public Halmaz<int> Csucsok 
+        { 
+            get
+            {
+                FaHalmaz<int> azonositok = new FaHalmaz<int>();
+                for (int i = 0; i < n; i++)
+                {
+                    azonositok.Beszur(i);
+                }
+                return azonositok;
+            } 
+        }
+
+
 
         public int ElekSzama()
         {
@@ -60,7 +79,7 @@ namespace OE.ALGA.Adatszerkezetek
             {
                 for (int j = 0; j < n; j++)
                 {
-                    if (M[i,j])
+                    if (M[i,j])                                 // ha igaz a M[honnan, hova]
                     {
                         elekSzama++;
                     }
@@ -69,23 +88,14 @@ namespace OE.ALGA.Adatszerkezetek
             return elekSzama;
         }
 
-        public Halmaz<int> Csucsok { get
-            {
-                FaHalmaz<int> azonositok = new FaHalmaz<int>();
-                for (int i = 0;i < n;i++)
-                {
-                    azonositok.Beszur(i);
-                }
-                return azonositok;
-            } 
-        }
-
-        public Halmaz<EgeszGrafEl> Elek { get
+        public Halmaz<EgeszGrafEl> Elek 
+        {
+            get
             {
                 FaHalmaz<EgeszGrafEl> faHalmaz = new FaHalmaz<EgeszGrafEl>();
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < n; i++)                                         // i sor -> Honnan
                 {
-                    for (int j = 0; j < n; j++)
+                    for (int j = 0; j < n; j++)                                     // j oszlop -> Hova
                     {
                         if (M[i, j])
                         {
@@ -97,24 +107,25 @@ namespace OE.ALGA.Adatszerkezetek
             }
         }
 
-        int Graf<int, EgeszGrafEl>.ElekSzama
-        {
-            get
-            {
-                int elekSzama = 0;
-                for (int i = 0; i < n; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
-                        if (M[i, j])
-                        {
-                            elekSzama++;
-                        }
-                    }
-                }
-                return elekSzama;
-            }
-        }
+        int Graf<int, EgeszGrafEl>.ElekSzama => ElekSzama();
+        //{
+        //    get
+        //    {
+        //        int elekSzama = 0;
+        //        for (int i = 0; i < n; i++)
+        //        {
+        //            for (int j = 0; j < n; j++)
+        //            {
+        //                if (M[i, j])
+        //                {
+        //                    elekSzama++;
+        //                }
+        //            }
+        //        }
+        //        return elekSzama;
+        //    }
+        //}
+
 
         public Halmaz<int> Szomszedai(int csucs)
         {
@@ -142,6 +153,7 @@ namespace OE.ALGA.Adatszerkezetek
 
     public class GrafBejarasok
     {
+        // először szomszédok, aztán azok szomszédjai stb.
         public static Halmaz<V> SzelessegiBejaras<V, E>(Graf<V, E> g, V start, Action<V> muvelet ) where V : IComparable<V>
         {
             LancoltSor<V> S = new LancoltSor<V>();
@@ -157,19 +169,18 @@ namespace OE.ALGA.Adatszerkezetek
 
                 g.Szomszedai(k).Bejar(i =>
                 {
-
                     if (!F.Eleme(i))
                     {
                         S.Sorba(i);
                         F.Beszur(i);
                     }
                 });
-                }
-
-            
+            }
             return F;
         }
 
+
+        // előrször egy szomszéd összes szomszédja lefele és aztán többi oldal
         public static Halmaz<V> MelysegiBejaras<V, E>(Graf<V, E> g, V start, Action<V> muvelet) where V : IComparable<V>
         {
             Halmaz<V> F = new FaHalmaz<V>();

@@ -25,7 +25,7 @@ namespace OE.ALGA.Optimalizalas
         public int LepesSzam { get; protected set; }
 
 
-        protected virtual void Backtrack(int szint, T[] E, bool van, T[] O)         
+        protected virtual void Backtrack(int szint, T[] E, ref bool van, T[] O)         
         {
             int i = 0;
             while (i < M[szint])                        // adott szinten a részmegoldások bejárása
@@ -48,7 +48,7 @@ namespace OE.ALGA.Optimalizalas
                     }
                     else
                     {
-                        Backtrack(szint + 1, E, van, O);
+                        Backtrack(szint + 1, E, ref van, O);
                     }
                 }
                 i++;
@@ -64,7 +64,7 @@ namespace OE.ALGA.Optimalizalas
             T[] O = new T[n];       // eddigi legjobb megoldás
             bool van = false;
 
-            Backtrack(0, E, van, O);
+            Backtrack(0, E, ref van, O);
 
             return O;
         }
@@ -82,9 +82,9 @@ namespace OE.ALGA.Optimalizalas
             this.problema = problema;
         }
 
-        public int LepesSzam { get; private set; }
+        public int LepesSzam { get; protected set; }
 
-        public bool[] OptimalisMegoldas()
+        public virtual bool[] OptimalisMegoldas()
         {
             int[] M = new int[problema.n];
             bool[,] R = new bool[problema.n, 2];
@@ -152,27 +152,32 @@ namespace OE.ALGA.Optimalizalas
             this.fb = fb;
         }
 
-        protected override void Backtrack(int szint, T[] E, bool van, T[] O)
+
+        protected override void Backtrack(int szint, T[] E, ref bool van, T[] O)
         {
             int i = 0;
             while (i < M[szint] )
             {
                 LepesSzam++;
-                if (ft(szint, R[szint, i]) && fk(szint, R[szint, i], E) )
+                if (ft(szint, R[szint, i]) && fk(szint, R[szint, i], E) )           // adott szinten lehetséges részmegoldás és nem ütközik előzővel sem
                 {
                     E[szint] = R[szint, i];
                     if (szint == n-1)
                     {
-                        Array.Copy(E, O, n);
-                        van = true;
+                        if (!van || josag(E) > josag(O))                        // ha még nincs teljes megoldásunk vagy az eddigi legjobb megoldásnál jobb a mostani
+                        {
+                            Array.Copy(E, O, n);
+                            van = true;
+                        }
                     }
-                    else if(!van || (josag(E) + fb(szint, E) > josag(O) ))              // ha még nincs teljes megoldás VAGY eddigi értékek és a hátralevő szintek becsült maximuma meghaladja eddigi legjobbat -> különben nincs értelme vizsgálni 
+                    else if((josag(E) + fb(szint, E) > josag(O)))              // ha még nincs teljes megoldás VAGY eddigi értékek és a hátralevő szintek becsült maximuma meghaladja eddigi legjobbat -> különben nincs értelme vizsgálni 
                     {
-                        Backtrack(szint + 1, E, van, O);
+                        Backtrack(szint + 1, E, ref van, O);
                     }
                 }
+                i++;
             }
-            i++;
+            
         }
 
 
@@ -180,12 +185,12 @@ namespace OE.ALGA.Optimalizalas
 
     public class SzetvalasztasEsKorlatozasHatizsakPakolas : VisszalepesesHatizsakPakolas
     {
-        public int LepesSzam { get; private set; }
+        
         public SzetvalasztasEsKorlatozasHatizsakPakolas(HatizsakProblema? problema) : base(problema)
         {
         }
 
-        public bool[] OptimalisMegoldas()
+        public override bool[] OptimalisMegoldas()
         {
             int[] M = new int[problema.n];
             bool[,] R = new bool[problema.n, 2];
@@ -223,25 +228,27 @@ namespace OE.ALGA.Optimalizalas
 
             };
 
-            Func<bool[], float> josag = (E) => problema.OsszErtek(E);
+            Func<bool[], float> josag = (E) =>
+            {
+                return problema.OsszErtek(E);
+            };
 
 
             // felső becslés
             Func<int, bool[], float> fb = (szint, E) =>
             {
                 float becsultErtek = 0;
-                for (int i = szint + 1; i < problema.n; i++)
+                for (int i = szint; i < problema.n; i++)
                 {
+                    if (problema.OsszSuly(E) + problema.w[i] <= problema.Wmax)
                     becsultErtek += problema.p[i];
                 }
-                return becsultErtek;
+                return becsultErtek ;
             };
 
             SzetvalasztasEsKorlatozasOptimalizacio<bool> szetvalasztasOptimalizalo = new SzetvalasztasEsKorlatozasOptimalizacio<bool>(problema.n, M, R, ft, fk, josag, fb);
-
-
-            SzetvalasztasEsKorlatozasOptimalizacio<bool> szetvalasztasEsKorlatozasOptimalizacio = new SzetvalasztasEsKorlatozasOptimalizacio<bool>(problema.n, M, R, ft, fk, josag, fb);
-            bool[] optimalis = szetvalasztasEsKorlatozasOptimalizacio.OptimalisMegoldas();
+            
+            bool[] optimalis = szetvalasztasOptimalizalo.OptimalisMegoldas();
 
             LepesSzam = szetvalasztasOptimalizalo.LepesSzam;
             return optimalis;

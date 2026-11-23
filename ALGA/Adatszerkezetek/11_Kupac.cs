@@ -4,10 +4,13 @@ namespace OE.ALGA.Adatszerkezetek
 {
     public class Kupac<T>
     {
+        // minden szülőnek nagyobb prioritásúnak kell lennie , mint a gyerekeinek -> E[0] legnagyobb mindig
+
+
         protected T[] E;            // kupac elemei
         protected int n;            // kupac aktuális elemei
 
-        protected Func<T, T, bool> nagyobbPrioritas;
+        protected Func<T, T, bool> nagyobbPrioritas;            // igaz ha első paraméter nagyobb piroritású, mint a második
 
         public Kupac(T[] e, int n, Func<T, T, bool> nagyobbPrioritas)
         {
@@ -19,7 +22,7 @@ namespace OE.ALGA.Adatszerkezetek
 
         public static int Bal(int i)
         {
-            return 2 * i + 1;
+            return 2 * i + 1;               // 0 alapú indexelés miatt
         }
 
         public static int Jobb(int i)
@@ -32,6 +35,8 @@ namespace OE.ALGA.Adatszerkezetek
             return (i - 1) / 2;
         }
 
+
+        // ha az i-edik kisebb prioritású, mint valamelyik gyereke, akkor cserél és rekurzívan folytat
         public void Kupacol(int i)
         {
             int bal = Bal(i);
@@ -44,19 +49,20 @@ namespace OE.ALGA.Adatszerkezetek
             if (jobb < n && nagyobbPrioritas(E[jobb], E[legnagyobb]))
                 legnagyobb = jobb;
 
-            if (legnagyobb != i)
+            if (legnagyobb != i)                                            // ha talált olyat, aminél nem stimmel a prioritás, akkor tömbön belül helycsere
             {
                 T seged = E[i];
                 E[i] = E[legnagyobb];
                 E[legnagyobb] = seged;
 
-                Kupacol(legnagyobb);
+                Kupacol(legnagyobb);                    // rekurzív folytatás lefele
             }
         }
 
+        // alulról felfele építi fel a kupacot ->  minden nem levél csomópontot kupacol
         public void KupacotEpit()
         {
-            
+            // n/2 -1 az utolsó nem levél csomópont indexe
             for (int i = (n / 2) - 1; i >= 0; i--)
             {
                 Kupacol(i);
@@ -66,7 +72,7 @@ namespace OE.ALGA.Adatszerkezetek
 
     public class KupacRendezes<T> : Kupac<T> where T : IComparable<T>
     {
-        public KupacRendezes(T[] A) : base(A, A.Length, (a, b) => a.CompareTo(b) > 0)
+        public KupacRendezes(T[] A) : base(A, A.Length, (a, b) => a.CompareTo(b) > 0)           // összehasonlíthatóság a prioritás meghatározására
         {
         }
 
@@ -75,6 +81,7 @@ namespace OE.ALGA.Adatszerkezetek
             this.n = E.Length;
             KupacotEpit();
 
+            // hátulról haladva a legnagyobb elemet a tömb végére rakja, majd újra kupacol 
             for (int i = E.Length - 1; i > 0; i--)
             {
                 T seged = E[0];
